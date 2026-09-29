@@ -38,16 +38,22 @@ def cards_row(cards):
     if not cards:
         return ""
     btns, panels = "", ""
-    for i, (icon, title, body) in enumerate(cards):
+    for i, (icon, title, body) in enumerate(cards):  # noqa: F402
         btns += (f'<button class="sx-card" data-i="{i}" aria-expanded="false">'
-                 f'<span class="sx-card__icon">{icon}</span><span>{title}</span></button>')
+                 f'{icon}<span>{title}</span></button>')
         panels += f'<div class="sx-cardpanel" data-i="{i}" hidden>{body}</div>'
     return f'<div class="sx-cards"><div class="sx-cards__row">{btns}</div>{panels}</div>'
 
 
+def icon(variant):
+    """Callout icon on its accent circle, same as the site's lc-callout__icon."""
+    svg = C.CALLOUT_ICONS.get(variant, C.CALLOUT_ICONS["info"]).strip()
+    color = C.CALLOUT_ACCENT.get(variant, C.CALLOUT_ACCENT["info"])
+    return f'<span class="sx-card__icon" style="background:{color}">{svg}</span>'
+
+
 def callout_card(b):
-    icon = C.CALLOUT_ICONS.get(b.get("variant", "info"), C.CALLOUT_ICONS["info"]).strip()
-    return (icon, b.get("title") or "More", C.render_callout(b))
+    return (icon(b.get("variant", "info")), b.get("title") or "More", C.render_callout(b))
 
 
 def split_sections(content):
@@ -92,10 +98,10 @@ def checkpoint_body(cp):
     for label in ("bookex_patterns", "tips_and_pitfalls"):
         if label in sec:
             blocks = sec.pop(label)
-            icon = C.CALLOUT_ICONS["bookex" if label == "bookex_patterns" else "pitfall"].strip()
+            ic = icon("bookex" if label == "bookex_patterns" else "pitfall")
             title = C.H3_LABELS.get(label, label.replace("_", " ").title())
             body = "".join(C.render_content_item(b, card_color="green") for b in blocks)
-            cards.insert(0 if label == "bookex_patterns" else 1, (icon, title, body))
+            cards.insert(0 if label == "bookex_patterns" else 1, (ic, title, body))
     for label, blocks in sec.items():  # anything unexpected stays visible
         s += h3(label) + render_blocks(blocks, cards)
     return s + cards_row(cards)
@@ -117,11 +123,11 @@ def build(d):
     # Start
     cards = []
     if d.get("timeGuide"):
-        cards.append((C.CALLOUT_ICONS["clock"].strip(), "Time Guide", inner(C.render_time_guide(d["timeGuide"]))))
+        cards.append((icon("clock"), "Time Guide", inner(C.render_time_guide(d["timeGuide"]))))
     if ov.get("keyConceptsText"):
-        cards.append((C.CALLOUT_ICONS["info"].strip(), "Key Concepts", f'<p>{ov["keyConceptsText"]}</p>'))
+        cards.append((icon("info"), "Key Concepts", f'<p>{ov["keyConceptsText"]}</p>'))
     if ov.get("textbookReference"):
-        cards.append((C.CALLOUT_ICONS["bookex"].strip(), "Textbook Reference", f'<p>{ov["textbookReference"]}</p>'))
+        cards.append((icon("bookex"), "Textbook Reference", f'<p>{ov["textbookReference"]}</p>'))
     body = f'<p class="sx-lead">{ov["body"]}</p>'
     if ov.get("mentorQuote"):
         body += C.render_mentor_quote(ov["mentorQuote"])
@@ -144,7 +150,7 @@ def build(d):
               + C.render_h3({"label": "Named Constants"}, "red") + C.render_named_constants(ov.get("namedConstants", []))
               + inner(C.render_final_checklist(fc_nodigest)))
     help_inner = inner(C.render_need_help(nh, meta.get("module", 1)))
-    finish += cards_row([(C.CALLOUT_ICONS["info"].strip(), "Need Help?", help_inner)])
+    finish += cards_row([(icon("info"), "Need Help?", help_inner)])
     tabs.append(("finish", "Finish", "path", header("LAB", labnum, "Before You Submit"), finish))
 
     # Reference tabs
@@ -221,9 +227,11 @@ body{margin:0}
 .sx-cards__row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
 .sx-card{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;cursor:pointer;
   background:rgba(0,0,0,.55);color:#F5F5F5;border:2px solid rgba(255,255,255,.25);border-radius:6px;font:600 14px Roboto,sans-serif}
-.sx-card__icon svg{width:28px;height:28px;display:block}
+.sx-card__icon{width:40px;height:40px;flex:0 0 40px;border:2px solid #000;border-radius:50%;box-shadow:2px 2px 0 #000;display:flex;align-items:center;justify-content:center}
+.sx-card__icon svg{width:24px;height:24px;display:block}
 .sx-card[aria-expanded=true]{border-color:#FFCC00;color:#FFCC00}
 .sx-cardpanel{margin-top:10px}
+.lc-objectives li{display:block} .lc-objectives li::before{margin-right:10px}
 #sx-diag{position:fixed;left:6px;bottom:6px;z-index:30;pointer-events:none;opacity:.85;background:#111;border:1px solid #444;
   color:#0f0;font:11px/1.35 monospace;padding:6px 8px;white-space:pre}
 </style></head><body>
