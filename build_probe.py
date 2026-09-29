@@ -59,21 +59,22 @@ def build(d):
     tabs = []
     tabs.append(("start", "Start", "path",
                  f'<p class="lead">{ov["body"]}</p><p>{ov.get("filenameNote", "")}</p>'
-                 f'<h3>Before You Begin</h3><p>{d["beforeYouBegin"]["intro"]}</p>'
-                 f'<pre class="code">{html.escape(d["beforeYouBegin"]["architecture"])}</pre>'))
+                 + "<h3>What You'll Learn</h3><ul>" + "".join(f"<li>{i}</li>" for i in ov["objectives"]) + "</ul>"
+                 + '<p>Where your new code goes: see the <a href="#outline" data-tab="outline">Outline</a> tab.</p>'))
     for cp in d["checkpoints"]:
         tabs.append((f'cp{cp["number"]}', f'CP{cp["number"]}', "path",
                      f'<p class="lead">{html.escape(cp["title"])}</p>' + checkpoint(cp)))
     tabs.append(("finish", "Finish", "path",
-                 "<h3>Before You Submit</h3><ul>" + "".join(f"<li>{i}</li>" for i in fc["beforeYouSubmit"]) + "</ul>"
+                 "<h3>Program Requirements</h3><ul>" + "".join(f"<li>{i}</li>" for i in ov["programRequirements"]) + "</ul>"
+                 + "<h3>Named Constants</h3><ul>" + "".join(
+                     f'<li><code>{c["name"]}</code>: {c["description"]}</li>' for c in ov["namedConstants"]) + "</ul>"
+                 + "<h3>Before You Submit</h3><ul>" + "".join(f"<li>{i}</li>" for i in fc["beforeYouSubmit"]) + "</ul>"
                  + "<h3>Expected Output</h3>"
                  + f'<pre class="out">{html.escape(fc["finalCheck"].get("expectedOutput", ""))}</pre>'
                  + "<h3>If You Get Stuck</h3><ul>" + "".join(f"<li>{i}</li>" for i in nh["ifYouGetStuck"]) + "</ul>"))
     tabs.append(("outline", "Outline", "ref",
-                 "<h3>Program Requirements</h3><ul>" + "".join(f"<li>{i}</li>" for i in ov["programRequirements"]) + "</ul>"
-                 + "<h3>Named Constants</h3><ul>" + "".join(
-                     f'<li><code>{c["name"]}</code>: {c["description"]}</li>' for c in ov["namedConstants"]) + "</ul>"
-                 + "<h3>Objectives</h3><ul>" + "".join(f"<li>{i}</li>" for i in ov["objectives"]) + "</ul>"))
+                 f'<p>{d["beforeYouBegin"]["intro"]}</p>'
+                 f'<pre class="code">{html.escape(d["beforeYouBegin"]["architecture"])}</pre>'))
     md = fc["messageDigest"]
     tabs.append(("strings", "Strings", "ref",
                  f'<p>{md["intro"]}</p><div class="tw"><table><tr><th>Purpose</th><th>Exact Text</th><th>Shown In</th></tr>'
